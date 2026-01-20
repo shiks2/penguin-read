@@ -11,6 +11,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/common/presentation/cubit/network_cubit.dart';
+import 'features/profile/presentation/cubit/profile_cubit.dart';
 import 'core/widgets/no_internet_widget.dart';
 import 'injection_container.dart' as di;
 
@@ -48,6 +49,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => di.sl<SettingsCubit>()..loadSettings(),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<ProfileCubit>(),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<NetworkCubit>(),
         ),
         BlocProvider(
           create: (_) => di.sl<NetworkCubit>(),

@@ -67,8 +67,7 @@ class _DashboardPageState extends State<DashboardPage> {
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthSuccess) {
-                return PopupMenuButton<String>(
-                  offset: const Offset(0, 48),
+                return IconButton(
                   icon: CircleAvatar(
                     backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
@@ -77,25 +76,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  onSelected: (value) {
-                    if (value == 'logout') {
-                      context.read<AuthBloc>().add(AuthLogoutRequested());
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'profile',
-                      enabled: false,
-                      child: Text('Profile'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'logout',
-                      child: Text(
-                        'Logout',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
+                  onPressed: () => context.push('/profile'),
                 );
               }
               // Guest or Initial

@@ -15,6 +15,9 @@ import 'features/reader/presentation/bloc/reader_bloc.dart';
 import 'features/settings/data/datasources/settings_local_data_source.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/common/presentation/cubit/network_cubit.dart';
+import 'features/stats/data/repositories/stats_repository_impl.dart';
+import 'features/stats/domain/repositories/stats_repository.dart';
+import 'features/profile/presentation/cubit/profile_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -59,6 +62,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterUser(sl()));
   sl.registerLazySingleton(() => LogoutUser(sl()));
 
+  // Stats
+  sl.registerLazySingleton<StatsRepository>(
+    () => StatsRepositoryImpl(supabaseClient: sl()),
+  );
+
+  // BLoC / Cubit
+
   // BLoC / Cubit
   sl.registerFactory(
     () => AuthBloc(
@@ -68,11 +78,16 @@ Future<void> init() async {
     ),
   );
 
-  sl.registerFactory(() => ReaderBloc());
+  sl.registerFactory(() => ReaderBloc(statsRepository: sl()));
 
   sl.registerFactory(() => SettingsCubit(localDataSource: sl()));
 
   sl.registerFactory(() => DashboardBloc(repository: sl()));
+
+  sl.registerFactory(() => ProfileCubit(
+        statsRepository: sl(),
+        authRepository: sl(),
+      ));
 
   // Common
   sl.registerFactory(() => NetworkCubit());
