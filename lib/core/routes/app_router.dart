@@ -7,6 +7,7 @@ import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/reader/presentation/bloc/reader_bloc.dart';
 import '../../features/reader/presentation/pages/reader_page.dart';
+import '../../features/settings/presentation/pages/about_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../injection_container.dart' as di;
 
@@ -43,6 +44,10 @@ class AppRouter {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: '/about',
+        builder: (context, state) => const AboutPage(),
       ),
     ],
   );

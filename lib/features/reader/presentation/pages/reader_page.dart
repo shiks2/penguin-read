@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../bloc/reader_bloc.dart';
+import '../widgets/celebration_overlay.dart';
 
 class ReaderPage extends StatefulWidget {
   final String text;
@@ -19,12 +20,13 @@ class ReaderPage extends StatefulWidget {
 }
 
 class _ReaderPageState extends State<ReaderPage> {
+  bool _showCelebration = false;
   @override
   void initState() {
     super.initState();
     // Get default WPM from Settings
     final defaultWpm = context.read<SettingsCubit>().state.defaultWpm;
-    
+
     // Dispatch start event via a customized event or just update WPM immediately after start?
     // Let's modify ReaderBloc to accept initial WPM or just update it right after start.
     context.read<ReaderBloc>().add(ReaderStarted(widget.text));
@@ -50,46 +52,76 @@ class _ReaderPageState extends State<ReaderPage> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: BlocBuilder<ReaderBloc, ReaderState>(
-        builder: (context, state) {
-          if (state.isCompleted) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Reading Completed!', style: TextStyle(fontSize: 24)),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<ReaderBloc>().add(ReaderStarted(widget.text));
-                    },
-                    child: const Text('Read Again'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text('Back to Dashboard'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return Column(
-            children: [
-              Expanded(
-                flex: 4,
-                child: Center(
-                  child: _buildRSVPWord(context, state.session.currentWord),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: _buildControls(context, state),
-              ),
-            ],
-          );
+      body: BlocListener<ReaderBloc, ReaderState>(
+        listenWhen: (previous, current) =>
+            !previous.isCompleted && current.isCompleted,
+        listener: (context, state) {
+          setState(() {
+            _showCelebration = true;
+          });
         },
+        child: Stack(
+          children: [
+            BlocBuilder<ReaderBloc, ReaderState>(
+              builder: (context, state) {
+                if (state.isCompleted) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Reading Completed!',
+                            style: TextStyle(fontSize: 24)),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<ReaderBloc>()
+                                .add(ReaderStarted(widget.text));
+                          },
+                          child: const Text('Read Again'),
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () => context.pop(),
+                          child: const Text('Back to Dashboard'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Center(
+                        child:
+                            _buildRSVPWord(context, state.session.currentWord),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: _buildControls(context, state),
+                    ),
+                  ],
+                );
+              },
+            ),
+            if (_showCelebration &&
+                context.read<ReaderBloc>().state.isCompleted)
+              CelebrationOverlay(
+                wpm: context.read<ReaderBloc>().state.session.wpm,
+                totalWords: widget.text.split(RegExp(r'\s+')).length,
+                onDismiss: () {
+                  if (mounted) {
+                    setState(() {
+                      _showCelebration = false;
+                    });
+                  }
+                },
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -99,7 +131,7 @@ class _ReaderPageState extends State<ReaderPage> {
 
     // ORP Logic: Find center
     final int centerIndex = (word.length / 2).floor();
-    
+
     // Split word into 3 parts: prefix, center letter, suffix
     final String prefix = word.substring(0, centerIndex);
     final String centerChar = word[centerIndex];
@@ -107,12 +139,14 @@ class _ReaderPageState extends State<ReaderPage> {
 
     final double fontSize = context.watch<SettingsCubit>().state.fontSize;
 
-    final TextStyle baseStyle = Theme.of(context).textTheme.displayMedium!.copyWith(
-      fontWeight: FontWeight.w500,
-      fontSize: fontSize,
-      letterSpacing: 1.2,
-      fontFamily: 'Courier New', // Monospace helps alignment, though not strictly required
-    );
+    final TextStyle baseStyle =
+        Theme.of(context).textTheme.displayMedium!.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: fontSize,
+              letterSpacing: 1.2,
+              fontFamily:
+                  'Courier New', // Monospace helps alignment, though not strictly required
+            );
 
     // Using FlexColorScheme means we have access to scheme colors.
     // Red accent for ORP.
@@ -123,9 +157,16 @@ class _ReaderPageState extends State<ReaderPage> {
       text: TextSpan(
         style: baseStyle,
         children: [
-          TextSpan(text: prefix, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-          TextSpan(text: centerChar, style: const TextStyle(color: highlightColor, fontWeight: FontWeight.bold)),
-          TextSpan(text: suffix, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+          TextSpan(
+              text: prefix,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+          TextSpan(
+              text: centerChar,
+              style: const TextStyle(
+                  color: highlightColor, fontWeight: FontWeight.bold)),
+          TextSpan(
+              text: suffix,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         ],
       ),
     );
@@ -139,7 +180,7 @@ class _ReaderPageState extends State<ReaderPage> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -154,7 +195,7 @@ class _ReaderPageState extends State<ReaderPage> {
             borderRadius: BorderRadius.circular(4),
           ),
           const SizedBox(height: 8),
-          
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -163,14 +204,18 @@ class _ReaderPageState extends State<ReaderPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Speed: ${state.session.wpm} WPM', style: Theme.of(context).textTheme.bodySmall),
+                    Text('Speed: ${state.session.wpm} WPM',
+                        style: Theme.of(context).textTheme.bodySmall),
                     Slider(
                       value: state.session.wpm.toDouble(),
                       min: AppConstants.minWPM.toDouble(),
                       max: AppConstants.maxWPM.toDouble(),
-                      divisions: (AppConstants.maxWPM - AppConstants.minWPM) ~/ 50,
+                      divisions:
+                          (AppConstants.maxWPM - AppConstants.minWPM) ~/ 50,
                       onChanged: (value) {
-                         context.read<ReaderBloc>().add(ReaderWPMUpdated(value.toInt()));
+                        context
+                            .read<ReaderBloc>()
+                            .add(ReaderWPMUpdated(value.toInt()));
                       },
                     ),
                   ],
@@ -186,7 +231,8 @@ class _ReaderPageState extends State<ReaderPage> {
                     context.read<ReaderBloc>().add(ReaderResumed());
                   }
                 },
-                child: Icon(state.session.isPlaying ? Icons.pause : Icons.play_arrow),
+                child: Icon(
+                    state.session.isPlaying ? Icons.pause : Icons.play_arrow),
               ),
             ],
           ),

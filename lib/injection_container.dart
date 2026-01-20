@@ -14,6 +14,7 @@ import 'features/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'features/reader/presentation/bloc/reader_bloc.dart';
 import 'features/settings/data/datasources/settings_local_data_source.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
+import 'features/common/presentation/cubit/network_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -28,9 +29,9 @@ Future<void> init() async {
     final supabase = Supabase.instance.client;
     sl.registerLazySingleton(() => supabase);
   } catch (e) {
-    // Supabase might fail in tests or if not initialized. 
+    // Supabase might fail in tests or if not initialized.
   }
-  
+
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 
@@ -38,11 +39,11 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(supabaseClient: sl()),
   );
-  
+
   sl.registerLazySingleton<SettingsLocalDataSource>(
     () => SettingsLocalDataSourceImpl(sharedPreferences: sl()),
   );
-  
+
   // Dashboard
   sl.registerLazySingleton<DashboardRepository>(
     () => DashboardRepositoryImpl(supabaseClient: sl()),
@@ -66,10 +67,13 @@ Future<void> init() async {
       logoutUser: sl(),
     ),
   );
-  
+
   sl.registerFactory(() => ReaderBloc());
-  
+
   sl.registerFactory(() => SettingsCubit(localDataSource: sl()));
-  
+
   sl.registerFactory(() => DashboardBloc(repository: sl()));
+
+  // Common
+  sl.registerFactory(() => NetworkCubit());
 }

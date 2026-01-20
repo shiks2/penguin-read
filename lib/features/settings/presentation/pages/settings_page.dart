@@ -34,11 +34,11 @@ class SettingsPage extends StatelessWidget {
                   onChanged: (value) {
                     context.read<SettingsCubit>().toggleTheme(value);
                   },
-                  secondary:  Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+                  secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Appearance Section
               Card(
                 child: Padding(
@@ -50,7 +50,8 @@ class SettingsPage extends StatelessWidget {
                         children: [
                           const Icon(Icons.text_fields),
                           const SizedBox(width: 8),
-                          Text('Font Size', style: Theme.of(context).textTheme.titleMedium),
+                          Text('Font Size',
+                              style: Theme.of(context).textTheme.titleMedium),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -83,31 +84,48 @@ class SettingsPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Row(
+                      Row(
                         children: [
                           const Icon(Icons.speed),
                           const SizedBox(width: 8),
-                          Text('Default Speed', style: Theme.of(context).textTheme.titleMedium),
+                          Text('Default Speed',
+                              style: Theme.of(context).textTheme.titleMedium),
                         ],
                       ),
                       const SizedBox(height: 16),
-                       Slider(
+                      Slider(
                         value: state.defaultWpm.toDouble(),
                         min: AppConstants.minWPM.toDouble(),
                         max: AppConstants.maxWPM.toDouble(),
-                        divisions: (AppConstants.maxWPM - AppConstants.minWPM) ~/ 50,
+                        divisions:
+                            (AppConstants.maxWPM - AppConstants.minWPM) ~/ 50,
                         label: '${state.defaultWpm} WPM',
                         onChanged: (value) {
-                          context.read<SettingsCubit>().updateDefaultWpm(value.toInt());
+                          context
+                              .read<SettingsCubit>()
+                              .updateDefaultWpm(value.toInt());
                         },
                       ),
-                       Center(
+                      Center(
                         child: Text('${state.defaultWpm} WPM'),
                       ),
                     ],
                   ),
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              // About Section
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('About'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () => context.push('/about'),
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           );
         },
