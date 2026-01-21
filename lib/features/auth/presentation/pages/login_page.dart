@@ -44,7 +44,10 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Text(
                         'PenguinRead',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).primaryColor,
                             ),
@@ -100,12 +103,21 @@ class _LoginPageState extends State<LoginPage> {
                               child: BlocBuilder<AuthBloc, AuthState>(
                                 builder: (context, state) {
                                   if (state is AuthLoading) {
-                                    return const Center(child: CircularProgressIndicator());
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   }
                                   return ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
+                                      foregroundColor: Colors.white,
+                                    ),
                                     onPressed: () {
-                                      if (_formKey.currentState?.saveAndValidate() ?? false) {
-                                        final values = _formKey.currentState!.value;
+                                      if (_formKey.currentState
+                                              ?.saveAndValidate() ??
+                                          false) {
+                                        final values =
+                                            _formKey.currentState!.value;
                                         context.read<AuthBloc>().add(
                                               AuthLoginRequested(
                                                 email: values['email'],
@@ -131,7 +143,8 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: () {
                                 context.push('/register');
                               },
-                              child: const Text("Don't have an account? Sign Up"),
+                              child:
+                                  const Text("Don't have an account? Sign Up"),
                             ),
                           ],
                         ),
