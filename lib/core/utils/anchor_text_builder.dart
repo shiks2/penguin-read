@@ -37,7 +37,7 @@ class AnchorTextBuilder {
           style: baseStyle.copyWith(
             fontWeight: FontWeight.normal,
             color: baseStyle.color
-                ?.withOpacity(0.65), // Reduce contrast of non-bold part
+                ?.withValues(alpha: 0.65), // Reduce contrast of non-bold part
           ),
         ),
       ],

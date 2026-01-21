@@ -56,7 +56,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     final isDark = await localDataSource.getThemeMode();
     final fontSize = await localDataSource.getFontSize();
     final defaultWpm = await localDataSource.getDefaultWpm();
-    // TODO: Load isAnchorMode from storage
+    final isAnchorMode = await localDataSource.getIsAnchorMode() ?? false;
 
     ThemeMode mode = ThemeMode.system;
     if (isDark != null) {
@@ -67,13 +67,13 @@ class SettingsCubit extends Cubit<SettingsState> {
       themeMode: mode,
       fontSize: fontSize,
       defaultWpm: defaultWpm,
-      // isAnchorMode: loadedValue
+      isAnchorMode: isAnchorMode,
     ));
   }
 
-  void toggleAnchorMode(bool value) {
+  Future<void> toggleAnchorMode(bool value) async {
+    await localDataSource.saveIsAnchorMode(value);
     emit(state.copyWith(isAnchorMode: value));
-    // TODO: persist
   }
 
   Future<void> toggleTheme(bool isDark) async {

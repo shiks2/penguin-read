@@ -109,27 +109,34 @@ class _GuidedParagraphViewState extends State<GuidedParagraphView> {
         text: TextSpan(
           style: TextStyle(
             fontSize: 20,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
+            color: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.color
+                ?.withValues(alpha: 0.7),
             height: 1.6,
-            fontFamily: 'Roboto', // Ensure good readability
+            fontFamily: 'Roboto',
           ),
-          children: List.generate(widget.words.length, (index) {
-            bool isCurrent = index == _localIndex;
-            return TextSpan(
-              text: "${widget.words[index]} ",
+          children: [
+            TextSpan(
+              text: _localIndex > 0
+                  ? "${widget.words.sublist(0, _localIndex).join(' ')} "
+                  : "",
+            ),
+            TextSpan(
+              text: "${widget.words[_localIndex]} ",
               style: TextStyle(
-                // Highlight logic
-                backgroundColor: isCurrent
-                    ? Colors.yellow.withValues(alpha: 0.3)
-                    : Colors.transparent,
-                color: (isCurrent
-                        ? Theme.of(context).primaryColor
-                        : Theme.of(context).textTheme.bodyLarge?.color)
-                    ?.withValues(alpha: isCurrent ? 1.0 : 0.7),
-                fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                backgroundColor: Colors.yellow.withValues(alpha: 0.3),
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
               ),
-            );
-          }),
+            ),
+            TextSpan(
+              text: _localIndex < widget.words.length - 1
+                  ? widget.words.sublist(_localIndex + 1).join(' ')
+                  : "",
+            ),
+          ],
         ),
       ),
     );

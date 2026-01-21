@@ -66,9 +66,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => di.sl<NetworkCubit>(),
         ),
-        BlocProvider(
-          create: (_) => di.sl<NetworkCubit>(),
-        ),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {

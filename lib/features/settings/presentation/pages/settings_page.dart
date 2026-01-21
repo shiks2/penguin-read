@@ -117,7 +117,7 @@ class SettingsPage extends StatelessWidget {
                         value: state.isAnchorMode,
                         onChanged: (val) =>
                             context.read<SettingsCubit>().toggleAnchorMode(val),
-                        activeColor: Theme.of(context).primaryColor,
+                        activeThumbColor: Theme.of(context).primaryColor,
                       ),
                     ],
                   ),

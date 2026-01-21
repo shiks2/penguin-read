@@ -39,7 +39,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
         ),
 
         // Snowfall Effect
-        Positioned.fill(child: const SnowfallWidget()),
+        const Positioned.fill(child: SnowfallWidget()),
 
         // Content
         Center(

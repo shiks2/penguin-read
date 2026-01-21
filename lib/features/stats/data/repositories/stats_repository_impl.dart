@@ -21,8 +21,6 @@ class StatsRepositoryImpl implements StatsRepository {
 
       await supabaseClient.from('reading_sessions').insert(model.toJson());
     } catch (e) {
-      // Handle error or rethrow
-      print('Error saving session: $e');
       // In a real app, wrap in Failure
     }
   }
@@ -47,7 +45,6 @@ class StatsRepositoryImpl implements StatsRepository {
           .map((json) => ReadingSessionModel.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error getting stats: $e');
       return [];
     }
   }

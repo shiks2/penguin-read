@@ -7,6 +7,8 @@ abstract class SettingsLocalDataSource {
   Future<double?> getFontSize();
   Future<void> saveDefaultWpm(int wpm);
   Future<int?> getDefaultWpm();
+  Future<void> saveIsAnchorMode(bool value);
+  Future<bool?> getIsAnchorMode();
 }
 
 class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
@@ -17,6 +19,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   static const String _themeModeKey = 'THEME_MODE_KEY';
   static const String _fontSizeKey = 'FONT_SIZE_KEY';
   static const String _defaultWpmKey = 'DEFAULT_WPM_KEY';
+  static const String _isAnchorModeKey = 'IS_ANCHOR_MODE_KEY';
 
   @override
   Future<void> saveThemeMode(bool isDark) async {
@@ -46,5 +49,15 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   @override
   Future<int?> getDefaultWpm() async {
     return sharedPreferences.getInt(_defaultWpmKey);
+  }
+
+  @override
+  Future<void> saveIsAnchorMode(bool value) async {
+    await sharedPreferences.setBool(_isAnchorModeKey, value);
+  }
+
+  @override
+  Future<bool?> getIsAnchorMode() async {
+    return sharedPreferences.getBool(_isAnchorModeKey);
   }
 }

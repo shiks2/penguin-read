@@ -39,9 +39,10 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   }
 
-  void _importPdf(BuildContext context) async {
+  void _importPdf() async {
     try {
       // Show loading indicator
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing PDF...')),
       );
@@ -77,7 +78,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _importPdf(context),
+        onPressed: () => _importPdf(),
         icon: const Icon(Icons.picture_as_pdf),
         label: const Text("Import PDF"),
       ),
@@ -153,7 +154,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               '• FOCUS • SPEED • RETAIN •',
                               style: GoogleFonts.spaceMono(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,  
+                                fontWeight: FontWeight.bold,
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
