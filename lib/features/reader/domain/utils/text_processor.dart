@@ -1,6 +1,8 @@
 class TextProcessor {
   const TextProcessor._();
 
+  static const _punctuation = ['.', '!', '?', ':', ';'];
+
   /// Splits text into words while keeping punctuation attached to the preceding word.
   static List<String> splitText(String text) {
     if (text.isEmpty) return [];
@@ -26,7 +28,7 @@ class TextProcessor {
 
     // Punctuation bonus
     final lastChar = word.isNotEmpty ? word[word.length - 1] : '';
-    if (['.', '!', '?', ':', ';'].contains(lastChar)) {
+    if (_punctuation.contains(lastChar)) {
       totalDelay += baseDelayMs * 0.50;
     } else if (lastChar == ',') {
       // Comma bonus (smaller)
