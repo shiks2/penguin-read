@@ -39,6 +39,14 @@ class ReaderWPMUpdated extends ReaderEvent {
   List<Object> get props => [wpm];
 }
 
+class ReaderIndexUpdated extends ReaderEvent {
+  final int index;
+  const ReaderIndexUpdated(this.index);
+
+  @override
+  List<Object> get props => [index];
+}
+
 class _ReaderTick extends ReaderEvent {} // Internal event
 
 // State
@@ -83,6 +91,7 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     on<ReaderResumed>(_onResumed);
     on<ReaderStopped>(_onStopped);
     on<ReaderWPMUpdated>(_onWPMUpdated);
+    on<ReaderIndexUpdated>(_onIndexUpdated);
     on<_ReaderTick>(_onTick);
   }
 
@@ -147,6 +156,22 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     // If playing, the next tick will naturally pick up the delay,
     // or we could cancel and reschedule immediately for responsiveness.
     // simpler to just let the current word finish its duration.
+  }
+
+  void _onIndexUpdated(ReaderIndexUpdated event, Emitter<ReaderState> emit) {
+    if (event.index < 0 || event.index >= state.session.words.length) return;
+
+    emit(state.copyWith(
+      session: state.session.copyWith(currentWordIndex: event.index),
+    ));
+
+    // If playing, we need to respect the new index for next tick
+    // The current timer is running for the OLD word.
+    // Ideally, we should restart the timer for the NEW word if playing.
+    if (state.session.isPlaying) {
+      _timer?.cancel();
+      _scheduleNextTick(state.session.words[event.index], state.session.wpm);
+    }
   }
 
   void _onTick(_ReaderTick event, Emitter<ReaderState> emit) {

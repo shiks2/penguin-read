@@ -7,6 +7,7 @@ import '../../../../core/utils/anchor_text_builder.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../bloc/reader_bloc.dart';
 import '../widgets/celebration_overlay.dart';
+import '../widgets/guided_paragraph_view.dart';
 
 class ReaderPage extends StatefulWidget {
   final String text;
@@ -22,14 +23,15 @@ class ReaderPage extends StatefulWidget {
 
 class _ReaderPageState extends State<ReaderPage> {
   bool _showCelebration = false;
+
+  // We use this key to access the GuidedView state if needed, but Bloc drives sync.
+
   @override
   void initState() {
     super.initState();
     // Get default WPM from Settings
     final defaultWpm = context.read<SettingsCubit>().state.defaultWpm;
 
-    // Dispatch start event via a customized event or just update WPM immediately after start?
-    // Let's modify ReaderBloc to accept initial WPM or just update it right after start.
     context.read<ReaderBloc>().add(ReaderStarted(widget.text));
     context.read<ReaderBloc>().add(ReaderWPMUpdated(defaultWpm));
   }
@@ -43,85 +45,129 @@ class _ReaderPageState extends State<ReaderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Using LayoutBuilder to ensure responsiveness (text size adaptation)
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Reading Session'),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
-        ),
-      ),
-      body: BlocListener<ReaderBloc, ReaderState>(
-        listenWhen: (previous, current) =>
-            !previous.isCompleted && current.isCompleted,
-        listener: (context, state) {
-          setState(() {
-            _showCelebration = true;
-          });
-        },
-        child: Stack(
-          children: [
-            BlocBuilder<ReaderBloc, ReaderState>(
-              builder: (context, state) {
-                if (state.isCompleted) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('Reading Completed!',
-                            style: TextStyle(fontSize: 24)),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<ReaderBloc>()
-                                .add(ReaderStarted(widget.text));
-                          },
-                          child: const Text('Read Again'),
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () => context.pop(),
-                          child: const Text('Back to Dashboard'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: Center(
-                        child:
-                            _buildRSVPWord(context, state.session.currentWord),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: _buildControls(context, state),
-                    ),
-                  ],
-                );
-              },
+    return BlocListener<ReaderBloc, ReaderState>(
+      listenWhen: (previous, current) =>
+          !previous.isCompleted && current.isCompleted,
+      listener: (context, state) {
+        setState(() {
+          _showCelebration = true;
+        });
+      },
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            title: const Text('Reading Session'),
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => context.pop(),
             ),
-            if (_showCelebration &&
-                context.read<ReaderBloc>().state.isCompleted)
-              CelebrationOverlay(
-                wpm: context.read<ReaderBloc>().state.session.wpm,
-                totalWords: widget.text.split(RegExp(r'\s+')).length,
-                onDismiss: () {
-                  if (mounted) {
-                    setState(() {
-                      _showCelebration = false;
-                    });
+            bottom: const TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.speed), text: "Speed (RSVP)"),
+                Tab(icon: Icon(Icons.menu_book), text: "Study (Guided)"),
+              ],
+            ),
+          ),
+          body: Stack(
+            children: [
+              BlocBuilder<ReaderBloc, ReaderState>(
+                builder: (context, state) {
+                  if (state.isCompleted) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Reading Completed!',
+                              style: TextStyle(fontSize: 24)),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () {
+                              context
+                                  .read<ReaderBloc>()
+                                  .add(ReaderStarted(widget.text));
+                            },
+                            child: const Text('Read Again'),
+                          ),
+                          const SizedBox(height: 16),
+                          TextButton(
+                            onPressed: () => context.pop(),
+                            child: const Text('Back to Dashboard'),
+                          ),
+                        ],
+                      ),
+                    );
                   }
+
+                  // If empty or loading
+                  if (state.session.words.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return TabBarView(
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Prevent conflict swipe
+                    children: [
+                      // TAB 1: Classic RSVP
+                      Column(
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Center(
+                              child: _buildRSVPWord(
+                                  context, state.session.currentWord),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: _buildControls(context, state),
+                          ),
+                        ],
+                      ),
+
+                      // TAB 2: Guided Paragraph
+                      Column(
+                        children: [
+                          Expanded(
+                            child: GuidedParagraphView(
+                              words: state.session.words,
+                              currentIndex: state.session.currentWordIndex,
+                              isPlaying: state.session.isPlaying,
+                              wpm: state.session.wpm,
+                              onIndexChanged: (newIndex) {
+                                context
+                                    .read<ReaderBloc>()
+                                    .add(ReaderIndexUpdated(newIndex));
+                              },
+                            ),
+                          ),
+                          // Reuse controls for Study mode too
+                          SizedBox(
+                            height: 120, // Compact controls
+                            child: _buildControls(context, state),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
                 },
               ),
-          ],
+              if (_showCelebration &&
+                  context.read<ReaderBloc>().state.isCompleted)
+                CelebrationOverlay(
+                  wpm: context.read<ReaderBloc>().state.session.wpm,
+                  totalWords: widget.text.split(RegExp(r'\s+')).length,
+                  onDismiss: () {
+                    if (mounted) {
+                      setState(() {
+                        _showCelebration = false;
+                      });
+                    }
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -139,8 +185,7 @@ class _ReaderPageState extends State<ReaderPage> {
               fontWeight: FontWeight.w500,
               fontSize: fontSize,
               letterSpacing: 1.2,
-              fontFamily:
-                  'Courier New', // Monospace helps alignment, though not strictly required
+              fontFamily: 'Courier New', // Monospace helps alignment
             );
 
     if (isAnchorMode) {
@@ -154,16 +199,10 @@ class _ReaderPageState extends State<ReaderPage> {
       );
     }
 
-    // ORP Logic: Find center
     final int centerIndex = (word.length / 2).floor();
-
-    // Split word into 3 parts: prefix, center letter, suffix
     final String prefix = word.substring(0, centerIndex);
     final String centerChar = word[centerIndex];
     final String suffix = word.substring(centerIndex + 1);
-
-    // Using FlexColorScheme means we have access to scheme colors.
-    // Red accent for ORP.
     const Color highlightColor = Colors.redAccent;
 
     return RichText(
@@ -201,19 +240,17 @@ class _ReaderPageState extends State<ReaderPage> {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Progress Bar
           LinearProgressIndicator(
             value: state.session.progress,
             borderRadius: BorderRadius.circular(4),
           ),
           const SizedBox(height: 8),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // WPM Slider
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,7 +273,6 @@ class _ReaderPageState extends State<ReaderPage> {
                 ),
               ),
               const SizedBox(width: 24),
-              // Play/Pause
               FloatingActionButton(
                 onPressed: () {
                   if (state.session.isPlaying) {
@@ -245,6 +281,7 @@ class _ReaderPageState extends State<ReaderPage> {
                     context.read<ReaderBloc>().add(ReaderResumed());
                   }
                 },
+                mini: true, // Make it simpler for shared layout
                 child: Icon(
                     state.session.isPlaying ? Icons.pause : Icons.play_arrow),
               ),
