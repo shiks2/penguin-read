@@ -1,69 +1,75 @@
-# 🐧 PenguinRead
+# PenguinRead
 
-**A minimalist, distraction-free speed reading application built with Flutter & Supabase.**
+PenguinRead is an open-source, offline-first speed reading application designed to eliminate subvocalization and eye movement using the Rapid Serial Visual Presentation (RSVP) method. Built with Flutter and Supabase, it is optimized for high-refresh-rate displays to ensure blur-free text rendering at speeds exceeding 500 WPM.
 
-PenguinRead uses the **RSVP (Rapid Serial Visual Presentation)** method to help users read text up to 3x faster than normal. By flashing words sequentially at a user-defined speed (WPM) and highlighting the **Optimal Recognition Point (ORP)**, it eliminates the time wasted on eye movement (saccades).
+## Project Overview
 
-![PenguinRead Banner](assets/logo.png) **
+Current market solutions for speed reading often suffer from feature bloat, subscription fatigue, or privacy concerns. PenguinRead addresses these issues by providing a lightweight, high-performance utility that prioritizes user privacy and rendering stability.
 
-## 🚀 Key Features
+**Core Philosophy:**
+- **Performance:** Native 120Hz+ support for fluid text updates.
+- **Privacy:** Complete offline functionality with zero data tracking.
+- **Accessibility:** Bionic reading modes and high-contrast themes.
 
-### 📖 The Engine (RSVP)
-* **Precision Timer:** Custom ticker logic handling speeds from **100 to 1000 WPM**.
-* **Smart Delays:** Algorithmically pauses on punctuation and long words to mimic natural speech rhythm.
-* **Red Focus Point:** Highlights the middle letter of every word to anchor the user's gaze.
+## Key Features
 
-### ⚡ Technical Highlights
-* **Clean Architecture:** Strict separation of concerns (Domain, Data, Presentation).
-* **Supabase Integration:** Fetches dynamic public domain stories from a PostgreSQL backend.
-* **Offline-First:** Global **Connectivity Listener** overlays a warning when the internet is lost, preventing crashes.
-* **High Performance:** Forces **120Hz refresh rates** on supported Android devices for blur-free high-speed reading.
+- **RSVP Engine:** Customizable words-per-minute (WPM) settings with variable chunk sizes.
+- **High Refresh Rate Support:** Forces 120Hz/144Hz modes on supported Android devices for superior motion clarity.
+- **Bionic Reading (Anchor Mode):** Highlights initial characters of words to guide visual fixation points.
+- **Offline Architecture:** All processing occurs locally; internet connection is optional.
+- **Cross-Platform:** Available for Android and Web.
+- **Supabase Integration:** Optional cloud sync for user preferences and library management.
 
-### 🎨 UI/UX Polish
-* **Animations:** Powered by `flutter_animate` for smooth entry transitions and `particle_field` for celebration effects.
-* **Theming:** Custom `FlexColorScheme` with Dark/Light mode support.
-* **Guest Mode:** Frictionless onboarding allowing users to read immediately without signing up.
+## Technology Stack
 
-## 🛠 Tech Stack
+- **Frontend:** Flutter (Dart)
+- **Backend/Auth:** Supabase
+- **State Management:** Flutter Bloc
+- **Local Storage:** Hive / SharedPreferences
 
-| Category | Technology |
-| :--- | :--- |
-| **Framework** | Flutter (Web & Mobile) |
-| **Language** | Dart |
-| **Backend** | Supabase (PostgreSQL + Auth) |
-| **State Management** | flutter_bloc (Cubit) |
-| **Navigation** | GoRouter |
-| **DI** | GetIt + Injectable |
-| **UI Libs** | FlexColorScheme, Flutter Form Builder, Animate |
+## Installation
 
-## 🏗 Installation & Run
+### Prerequisites
+- Flutter SDK (v3.0 or higher)
+- Dart SDK
+- Android Studio or VS Code
 
-1.  **Clone the repo:**
-    ```bash
-    git clone [https://github.com/shiks2/penguin-read.git](https://github.com/shiks2/penguin-read.git)
-    ```
-2.  **Install Dependencies:**
-    ```bash
-    flutter pub get
-    ```
-3.  **Run:**
-    ```bash
-    flutter run -d chrome
-    ```
+### Setup
 
-## 🤝 Contributing
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/TeamInnerCircle/penguinread.git
+   cd penguinread
+   ```
 
-Contributions are welcome! Please check the [Issues](https://github.com/shiks2/penguin-read/issues) tab to find bugs or feature requests.
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+3. **Configure Environment**
+   Create a launch configuration or pass flags directly for Supabase keys.
+   *Note: This project relies on `--dart-define` for API keys security.*
 
-## 📄 License
+4. **Run the Application**
+   ```bash
+   flutter run --release
+   ```
+
+## Contributing
+
+We welcome contributions from the community. Whether it is a UI improvement, bug fix, or documentation update, your input is valuable.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Developed with 💙 by [Shiks2](https://github.com/shiks2)*
+
+**Developed by TeamInnerCircle**
