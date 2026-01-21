@@ -109,6 +109,16 @@ class SettingsPage extends StatelessWidget {
                       Center(
                         child: Text('${state.defaultWpm} WPM'),
                       ),
+                      const Divider(),
+                      SwitchListTile(
+                        title: const Text('Anchor Mode'),
+                        subtitle: const Text(
+                            'Highlight text start point for faster fixation'),
+                        value: state.isAnchorMode,
+                        onChanged: (val) =>
+                            context.read<SettingsCubit>().toggleAnchorMode(val),
+                        activeColor: Theme.of(context).primaryColor,
+                      ),
                     ],
                   ),
                 ),

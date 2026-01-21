@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/anchor_text_builder.dart';
 import '../../../settings/presentation/cubit/settings_cubit.dart';
 import '../bloc/reader_bloc.dart';
 import '../widgets/celebration_overlay.dart';
@@ -129,15 +130,9 @@ class _ReaderPageState extends State<ReaderPage> {
   Widget _buildRSVPWord(BuildContext context, String word) {
     if (word.isEmpty) return const SizedBox.shrink();
 
-    // ORP Logic: Find center
-    final int centerIndex = (word.length / 2).floor();
-
-    // Split word into 3 parts: prefix, center letter, suffix
-    final String prefix = word.substring(0, centerIndex);
-    final String centerChar = word[centerIndex];
-    final String suffix = word.substring(centerIndex + 1);
-
-    final double fontSize = context.watch<SettingsCubit>().state.fontSize;
+    final settingsState = context.watch<SettingsCubit>().state;
+    final double fontSize = settingsState.fontSize;
+    final bool isAnchorMode = settingsState.isAnchorMode;
 
     final TextStyle baseStyle =
         Theme.of(context).textTheme.displayMedium!.copyWith(
@@ -147,6 +142,25 @@ class _ReaderPageState extends State<ReaderPage> {
               fontFamily:
                   'Courier New', // Monospace helps alignment, though not strictly required
             );
+
+    if (isAnchorMode) {
+      return RichText(
+        textAlign: TextAlign.center,
+        text: AnchorTextBuilder.build(
+          word: word,
+          baseStyle: baseStyle,
+          isAnchorMode: true,
+        ),
+      );
+    }
+
+    // ORP Logic: Find center
+    final int centerIndex = (word.length / 2).floor();
+
+    // Split word into 3 parts: prefix, center letter, suffix
+    final String prefix = word.substring(0, centerIndex);
+    final String centerChar = word[centerIndex];
+    final String suffix = word.substring(centerIndex + 1);
 
     // Using FlexColorScheme means we have access to scheme colors.
     // Red accent for ORP.

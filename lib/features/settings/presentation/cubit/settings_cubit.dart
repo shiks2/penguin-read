@@ -9,11 +9,13 @@ class SettingsState extends Equatable {
   final ThemeMode themeMode;
   final double fontSize;
   final int defaultWpm;
+  final bool isAnchorMode;
 
   const SettingsState({
     required this.themeMode,
     required this.fontSize,
     required this.defaultWpm,
+    required this.isAnchorMode,
   });
 
   factory SettingsState.initial() {
@@ -21,6 +23,7 @@ class SettingsState extends Equatable {
       themeMode: ThemeMode.system,
       fontSize: 32.0,
       defaultWpm: 300,
+      isAnchorMode: false,
     );
   }
 
@@ -28,28 +31,32 @@ class SettingsState extends Equatable {
     ThemeMode? themeMode,
     double? fontSize,
     int? defaultWpm,
+    bool? isAnchorMode,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
       fontSize: fontSize ?? this.fontSize,
       defaultWpm: defaultWpm ?? this.defaultWpm,
+      isAnchorMode: isAnchorMode ?? this.isAnchorMode,
     );
   }
 
   @override
-  List<Object> get props => [themeMode, fontSize, defaultWpm];
+  List<Object> get props => [themeMode, fontSize, defaultWpm, isAnchorMode];
 }
 
 // Cubit
 class SettingsCubit extends Cubit<SettingsState> {
   final SettingsLocalDataSource localDataSource;
 
-  SettingsCubit({required this.localDataSource}) : super(SettingsState.initial());
+  SettingsCubit({required this.localDataSource})
+      : super(SettingsState.initial());
 
   Future<void> loadSettings() async {
     final isDark = await localDataSource.getThemeMode();
     final fontSize = await localDataSource.getFontSize();
     final defaultWpm = await localDataSource.getDefaultWpm();
+    // TODO: Load isAnchorMode from storage
 
     ThemeMode mode = ThemeMode.system;
     if (isDark != null) {
@@ -60,7 +67,13 @@ class SettingsCubit extends Cubit<SettingsState> {
       themeMode: mode,
       fontSize: fontSize,
       defaultWpm: defaultWpm,
+      // isAnchorMode: loadedValue
     ));
+  }
+
+  void toggleAnchorMode(bool value) {
+    emit(state.copyWith(isAnchorMode: value));
+    // TODO: persist
   }
 
   Future<void> toggleTheme(bool isDark) async {
