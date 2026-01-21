@@ -15,7 +15,8 @@ Current market solutions for speed reading often suffer from feature bloat, subs
 
 - **RSVP Engine:** Customizable words-per-minute (WPM) settings with variable chunk sizes.
 - **High Refresh Rate Support:** Forces 120Hz/144Hz modes on supported Android devices for superior motion clarity.
-- **Bionic Reading (Anchor Mode):** Highlights initial characters of words to guide visual fixation points.
+- **Anchor Mode (Bionic Style):** Algorithmic highlighting of initial characters to guide visual fixation points and reduce eye strain.
+- **Local PDF Import:** Extract and read text directly from PDF documents without server-side processing.
 - **Offline Architecture:** All processing occurs locally; internet connection is optional.
 - **Cross-Platform:** Available for Android and Web.
 - **Supabase Integration:** Optional cloud sync for user preferences and library management.
@@ -26,6 +27,7 @@ Current market solutions for speed reading often suffer from feature bloat, subs
 - **Backend/Auth:** Supabase
 - **State Management:** Flutter Bloc
 - **Local Storage:** Hive / SharedPreferences
+- **PDF Engine:** Syncfusion Flutter PDF
 
 ## Installation
 
@@ -56,15 +58,23 @@ Current market solutions for speed reading often suffer from feature bloat, subs
    flutter run --release
    ```
 
-## Contributing
+## Call for Contributors
 
-We welcome contributions from the community. Whether it is a UI improvement, bug fix, or documentation update, your input is valuable.
+TeamInnerCircle is dedicated to building high-quality, open-source software. As we approach our v1.0 launch, we are inviting designers and developers to collaborate on the next phase of PenguinRead.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+**Current Open Roles (Volunteer):**
+
+* **Visual Identity Lead:** We are seeking a contributor to design a professional logo and brand assets to replace existing placeholders.
+* **UI/UX Specialist:** We are looking for input on improving accessibility and reading ergonomics for neurodivergent users (ADHD/Dyslexia).
+
+**Why Contribute?**
+
+* **Attribution:** All contributors receive full credit in the repository and the application's "About" page.
+* **Portfolio Impact:** Your designs will be featured in our upcoming public launch on Product Hunt.
+* **Open Source Growth:** Gain experience shipping a production-grade Flutter application with a real user base.
+
+**How to Join:**
+If you are interested in contributing, please open a GitHub Issue titled **"Design Proposal"** or start a discussion in this repository.
 
 ## License
 

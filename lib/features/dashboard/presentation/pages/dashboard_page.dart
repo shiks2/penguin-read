@@ -13,6 +13,7 @@ import 'dart:math';
 
 import '../../../../core/constants/content_constants.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../../core/services/pdf_service.dart';
 import '../bloc/dashboard_bloc.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -38,9 +39,48 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   }
 
+  void _importPdf(BuildContext context) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Processing PDF...')),
+      );
+
+      final pdfService = PdfService();
+      final text = await pdfService.pickAndExtractText();
+
+      if (text != null && mounted) {
+        // SUCCESS: Pre-fill the text field
+        _formKey.currentState?.fields['text']?.didChange(text);
+
+        // Notify user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('PDF Imported! Ready to read.'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Error: ${e.toString().replaceAll("Exception:", "")}'),
+              backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _importPdf(context),
+        icon: const Icon(Icons.picture_as_pdf),
+        label: const Text("Import PDF"),
+      ),
       appBar: AppBar(
         title: DefaultTextStyle(
           style: GoogleFonts.spaceMono(
@@ -113,7 +153,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               '• FOCUS • SPEED • RETAIN •',
                               style: GoogleFonts.spaceMono(
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.bold,  
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
