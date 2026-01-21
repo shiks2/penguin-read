@@ -26,10 +26,20 @@ Future<void> main() async {
     }
   }
 
-  // Initialize Supabase
+  // 1. Retrieve keys from the build environment
+  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+  // 2. Safety Check (Fail Fast)
+  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+    throw Exception('CRITICAL ERROR: Supabase keys are missing. '
+        'Please run with --dart-define=SUPABASE_URL=... and --dart-define=SUPABASE_ANON_KEY=...');
+  }
+
+  // 3. Initialize
   await Supabase.initialize(
-    url: 'https://kyrwezdztzeooossowcx.supabase.co',
-    anonKey: 'sb_publishable_mjq1MkDHdUKsx5juNej5vQ_D1Mbi_1i',
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   await di.init();
