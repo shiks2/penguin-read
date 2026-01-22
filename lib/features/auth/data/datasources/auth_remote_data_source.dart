@@ -30,11 +30,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<User> register({required String email, required String password}) async {
+  Future<User> register(
+      {required String email, required String password}) async {
     try {
       final response = await supabaseClient.auth.signUp(
         email: email,
         password: password,
+        emailRedirectTo: 'io.penguinread://login-callback',
       );
       if (response.user == null) {
         throw const ServerException('Registration failed: No user returned');

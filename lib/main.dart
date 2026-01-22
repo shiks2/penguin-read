@@ -40,6 +40,9 @@ Future<void> main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce, // Recommended for Mobile Deep Linking
+    ),
   );
 
   await di.init();

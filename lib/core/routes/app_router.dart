@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/pages/auth_gate.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
@@ -14,8 +15,12 @@ import '../../injection_container.dart' as di;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/login', // Default start, but user can skip
+    initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const AuthGate(),
+      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginPage(),
